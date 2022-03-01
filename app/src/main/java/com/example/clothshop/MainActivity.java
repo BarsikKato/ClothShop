@@ -1,11 +1,16 @@
 package com.example.clothshop;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 
 import androidx.navigation.NavController;
@@ -17,60 +22,118 @@ import com.example.clothshop.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-
-    private AppBarConfiguration appBarConfiguration;
-    private ActivityMainBinding binding;
-
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    Button btnBackToMain, btnOrder;
+    DBHelper dbHelper;
+    SQLiteDatabase database;
+    int sum = 0;
+    TextView sumInCart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        sumInCart = findViewById(R.id.sumInCart);
 
-        setSupportActionBar(binding.toolbar);
+        btnBackToMain = (Button) findViewById(R.id.btnBackToMain);
+        btnBackToMain.setOnClickListener(this);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        btnOrder = (Button) findViewById(R.id.btnOrder);
+        btnOrder.setOnClickListener(this);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+        dbHelper = new DBHelper(this);
+
+        database = dbHelper.getWritableDatabase();
+
+        UpdateTable();
+
+    }
+    public void UpdateTable()
+    {
+        Cursor cursor = database.query(DBHelper.TABLE_GOODS, null, null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
+            int nameIndex = cursor.getColumnIndex(DBHelper.KEY_NAME);
+            int priceIndex = cursor.getColumnIndex(DBHelper.KEY_PRICE);
+            TableLayout dbOutput = findViewById(R.id.dbOutput);
+            dbOutput.removeAllViews();
+            do{
+                TableRow dbOutputRow = new TableRow(this);
+
+                dbOutputRow.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+
+                TextView outputID = new TextView(this);
+                params.weight = 1.0f;
+                outputID.setLayoutParams(params);
+                outputID.setText(cursor.getString(idIndex));
+                dbOutputRow.addView(outputID);
+
+                TextView outputName = new TextView(this);
+                params.weight = 3.0f;
+                outputName.setLayoutParams(params);
+                outputName.setText(cursor.getString(nameIndex));
+                dbOutputRow.addView(outputName);
+
+                TextView outputPrice = new TextView(this);
+                params.weight = 3.0f;
+                outputPrice.setLayoutParams(params);
+                outputPrice.setText(cursor.getString(priceIndex));
+                dbOutputRow.addView(outputPrice);
+
+                Button btnToCart = new Button(this);
+                btnToCart.setOnClickListener(this);
+                params.weight = 1.0f;
+                btnToCart.setLayoutParams(params);
+                btnToCart.setText("Добавить в корзину");
+                btnToCart.setTag("cart");
+                btnToCart.setId(cursor.getInt(idIndex));
+                dbOutputRow.addView(btnToCart);
+
+
+                dbOutput.addView(dbOutputRow);
             }
-        });
+            while (cursor.moveToNext());
+        } else
+            Log.d("mLog","0 rows");
+
+        cursor.close();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void ChangeSum(int sumToAdd)
+    {
+        sum = sum + sumToAdd;
+        sumInCart.setText("Сумма заказа: "  + sum);
     }
-
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnBackToMain:
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btnOrder:
+                Toast toast = new Toast(getApplicationContext());
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setText("Заказ на сумму " + sum + " составлен.");
+                toast.show();
+                ChangeSum(-sum);
+                break;
+            default:
+                Cursor cursorUpdater = database.query(DBHelper.TABLE_GOODS, null, null, null, null, null, null);
+                cursorUpdater.move(v.getId());
+                int priceIndex = cursorUpdater.getColumnIndex(DBHelper.KEY_PRICE);
+                String priceKek = cursorUpdater.getString(priceIndex);
+                ChangeSum(Integer.parseInt(priceKek));
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
     }
 }
