@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    Button btnOpenDatabase, btnOrder;
+    Button btnOpenDatabase, btnCart;
     DBHelper dbHelper;
     SQLiteDatabase database;
     int sum = 0;
@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnOpenDatabase = (Button) findViewById(R.id.btnOpenDatabase);
         btnOpenDatabase.setOnClickListener(this);
 
-        btnOrder = (Button) findViewById(R.id.btnOrder);
-        btnOrder.setOnClickListener(this);
+        btnCart = (Button) findViewById(R.id.btnCart);
+        btnCart.setOnClickListener(this);
 
         dbHelper = new DBHelper(this);
 
@@ -122,14 +122,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnCart:
                 Intent intentCart = new Intent(this, CartActivity.class);
                 startActivity(intentCart);
-                break;
-            case R.id.btnOrder:
-                Toast toast = new Toast(getApplicationContext());
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.setDuration(Toast.LENGTH_LONG);
-                toast.setText("Заказ на сумму " + sum + " составлен.");
-                toast.show();
-                ChangeSum(-sum);
                 break;
             default:
                 Cursor cursorUpdater = database.query(DBHelper.TABLE_GOODS, null, null, null, null, null, null);

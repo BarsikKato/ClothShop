@@ -20,6 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AuthActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".CartActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".AdminActivity"
+            android:exported="true"/>
     </application>
 
 </manifest>
