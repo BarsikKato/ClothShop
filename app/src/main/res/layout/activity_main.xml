@@ -30,18 +30,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/btnOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Заказать"></Button>
+
             <Button
-                android:id="@+id/btnBackToMain"
+                android:id="@+id/btnOpenDatabase"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Войти в БД"></Button>
+
+            <Button
+                android:id="@+id/btnCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Корзина"></Button>
         </LinearLayout>
 
         <TableLayout

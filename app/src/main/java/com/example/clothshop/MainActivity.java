@@ -30,7 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    Button btnBackToMain, btnOrder;
+    Button btnOpenDatabase, btnOrder;
     DBHelper dbHelper;
     SQLiteDatabase database;
     int sum = 0;
@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         sumInCart = findViewById(R.id.sumInCart);
 
-        btnBackToMain = (Button) findViewById(R.id.btnBackToMain);
-        btnBackToMain.setOnClickListener(this);
+        btnOpenDatabase = (Button) findViewById(R.id.btnOpenDatabase);
+        btnOpenDatabase.setOnClickListener(this);
 
         btnOrder = (Button) findViewById(R.id.btnOrder);
         btnOrder.setOnClickListener(this);
@@ -115,9 +115,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnBackToMain:
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
+            case R.id.btnOpenDatabase:
+                Intent intentDB = new Intent(this, AuthActivity.class);
+                startActivity(intentDB);
+                break;
+            case R.id.btnCart:
+                Intent intentCart = new Intent(this, CartActivity.class);
+                startActivity(intentCart);
                 break;
             case R.id.btnOrder:
                 Toast toast = new Toast(getApplicationContext());

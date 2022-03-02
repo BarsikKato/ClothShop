@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/app/src/main/res/layout/activity_auth.xml" value="0.34057971014492755" />
+        <entry key="..\:/Android/app/src/main/res/layout/activity_cart.xml" value="0.25" />
         <entry key="..\:/Android/app/src/main/res/layout/activity_main.xml" value="0.35260416666666666" />
       </map>
     </option>
