@@ -23,7 +23,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_ORDERGOODID = "_id";
     public static final String KEY_OORDERID = "orderid";
     public static final String KEY_GOODID = "goodid";
-    public static final String KEY_GOODCOUNT = "count";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + TABLE_ORDERS + "(" + KEY_ORDERID
                 + " integer primary key," + KEY_USERNAME + " text," + KEY_USERADDRESS + " text," + KEY_USERPHONE + " text" + ")");
         db.execSQL("create table " + TABLE_ORDERGOODS + "(" + KEY_ORDERGOODID
-                + " integer primary key," + KEY_OORDERID + " text," + KEY_GOODID + " text," +  KEY_GOODCOUNT + " text" + ")");
+                + " integer primary key," + KEY_OORDERID + " text," + KEY_GOODID + " text" + ")");
     }
 
     @Override

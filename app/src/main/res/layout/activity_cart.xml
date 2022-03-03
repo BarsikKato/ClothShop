@@ -44,7 +44,7 @@
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:minHeight="48dp"
-                android:text="Name" />
+                android:hint="Имя" />
 
             <EditText
                 android:id="@+id/editTextTextPostalAddress"
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Address"
+                android:hint="Адрес"
                 android:inputType="textPostalAddress"
                 android:minHeight="48dp" />
 
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Phone"
+                android:hint="Телефон"
                 android:inputType="phone"
                 android:minHeight="48dp" />
 

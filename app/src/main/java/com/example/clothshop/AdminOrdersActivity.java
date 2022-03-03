@@ -17,8 +17,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
-    EditText etName, etPrice;
+public class AdminOrdersActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnAdd, btnClear, btnShop, btnOrders;
     DBHelper dbHelper;
     SQLiteDatabase database;
@@ -27,13 +26,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin);
-
-        etName = (EditText) findViewById(R.id.etName);
-        etPrice = (EditText) findViewById(R.id.etPrice);
-
-        btnAdd = (Button) findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(this);
+        setContentView(R.layout.activity_adminorders);
 
         btnClear = (Button) findViewById(R.id.btnClear);
         btnClear.setOnClickListener(this);
@@ -52,12 +45,13 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
 
     public void UpdateTable()
     {
-        Cursor cursor = database.query(DBHelper.TABLE_GOODS, null, null, null, null, null, null);
+        Cursor cursor = database.query(DBHelper.TABLE_ORDERS, null, null, null, null, null, null);
 
         if (cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndex(DBHelper.KEY_ID);
-            int nameIndex = cursor.getColumnIndex(DBHelper.KEY_NAME);
-            int priceIndex = cursor.getColumnIndex(DBHelper.KEY_PRICE);
+            int idOrder = cursor.getColumnIndex(DBHelper.KEY_ORDERID);
+            int idUsername = cursor.getColumnIndex(DBHelper.KEY_USERNAME);
+            int idAddress = cursor.getColumnIndex(DBHelper.KEY_USERADDRESS);
+            int idPhone = cursor.getColumnIndex(DBHelper.KEY_USERPHONE);
             TableLayout dbOutput = findViewById(R.id.dbOutput);
             dbOutput.removeAllViews();
             do{
@@ -66,31 +60,43 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
                 dbOutputRow.setLayoutParams(new ViewGroup.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                 TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
 
-                TextView outputID = new TextView(this);
+                TextView outputOrderId = new TextView(this);
                 params.weight = 1.0f;
-                outputID.setLayoutParams(params);
-                outputID.setText(cursor.getString(idIndex));
-                dbOutputRow.addView(outputID);
+                outputOrderId.setLayoutParams(params);
+                outputOrderId.setText(cursor.getString(idOrder));
+                dbOutputRow.addView(outputOrderId);
 
-                TextView outputName = new TextView(this);
+                TextView outputUsername = new TextView(this);
                 params.weight = 3.0f;
-                outputName.setLayoutParams(params);
-                outputName.setText(cursor.getString(nameIndex));
-                dbOutputRow.addView(outputName);
+                outputUsername.setLayoutParams(params);
+                outputUsername.setText(cursor.getString(idUsername));
+                dbOutputRow.addView(outputUsername);
 
-                TextView outputPrice = new TextView(this);
+                TextView outputAddress = new TextView(this);
                 params.weight = 3.0f;
-                outputPrice.setLayoutParams(params);
-                outputPrice.setText(cursor.getString(priceIndex));
-                dbOutputRow.addView(outputPrice);
+                outputAddress.setLayoutParams(params);
+                outputAddress.setText(cursor.getString(idAddress));
+                dbOutputRow.addView(outputAddress);
+
+                TextView outputPhone = new TextView(this);
+                params.weight = 3.0f;
+                outputPhone.setLayoutParams(params);
+                outputPhone.setText(cursor.getString(idPhone));
+                dbOutputRow.addView(outputPhone);
+
+                TextView outputList = new TextView(this);
+                params.weight = 3.0f;
+                outputList.setLayoutParams(params);
+                outputList.setText(GetOrderGoods(cursor.getString(idOrder)));
+                dbOutputRow.addView(outputList);
 
                 Button buttonDelete = new Button(this);
                 buttonDelete.setOnClickListener(this);
                 params.weight = 1.0f;
                 buttonDelete.setLayoutParams(params);
-                buttonDelete.setText("Удалить товар");
+                buttonDelete.setText("Отменить");
                 buttonDelete.setTag("delete");
-                buttonDelete.setId(cursor.getInt(idIndex));
+                buttonDelete.setId(cursor.getInt(idOrder));
                 dbOutputRow.addView(buttonDelete);
 
                 dbOutput.addView(dbOutputRow);
@@ -102,34 +108,37 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         cursor.close();
     }
 
+    public String GetOrderGoods(String orderId)
+    {
+        String orderedGoodsList = "";
+        Cursor c = database.rawQuery("SELECT goodid FROM ordergoods WHERE orderid = " + orderId, null);
+        if (c.moveToFirst())
+        {
+            do
+            {
+                String goodId = c.getString(0);
+                Cursor c2= database.rawQuery("SELECT name FROM goods WHERE _id = " + 5, null);
+                if (c2.moveToFirst())
+                {
+                    do
+                    {
+                        String goodName = c.getString(0);
+                        orderedGoodsList += goodName + "; ";
+                    }
+                    while(c2.moveToNext());
+                }
+                c2.close();
+            }
+            while(c.moveToNext());
+        }
+        c.close();
+        return orderedGoodsList;
+    }
+
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnAdd:
-                contentValues = new ContentValues();
-                String name = etName.getText().toString();
-                String price = etPrice.getText().toString();
-                contentValues.put(DBHelper.KEY_NAME, name);
-                contentValues.put(DBHelper.KEY_PRICE, price);
-                database.insert(DBHelper.TABLE_GOODS, null, contentValues);
-                UpdateTable();
-                etName.setText("");
-                etPrice.setText("");
-                break;
-            case R.id.btnClear:
-                database.delete(DBHelper.TABLE_GOODS, null, null);
-                TableLayout dbOutput = findViewById(R.id.dbOutput);
-                dbOutput.removeAllViews();
-                UpdateTable();
-                break;
-            case R.id.btnShop:
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.btnOrders:
-                Intent intentOrders = new Intent(this, AdminOrdersActivity.class);
-                startActivity(intentOrders);
-                break;
+        switch (v.getId())
+        {
             default:
                 if(v.getTag() == "delete") {
                     View outputDBRow = (View) v.getParent();

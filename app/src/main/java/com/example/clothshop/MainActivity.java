@@ -18,8 +18,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.clothshop.databinding.ActivityMainBinding;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -28,6 +26,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.sql.Struct;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     Button btnOpenDatabase, btnCart;
@@ -89,16 +89,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 outputPrice.setText(cursor.getString(priceIndex));
                 dbOutputRow.addView(outputPrice);
 
-                Button btnToCart = new Button(this);
-                btnToCart.setOnClickListener(this);
+                Button buttonDelete = new Button(this);
+                buttonDelete.setOnClickListener(this);
                 params.weight = 1.0f;
-                btnToCart.setLayoutParams(params);
-                btnToCart.setText("Добавить в корзину");
-                btnToCart.setTag("cart");
-                btnToCart.setId(cursor.getInt(idIndex));
-                dbOutputRow.addView(btnToCart);
+                buttonDelete.setLayoutParams(params);
 
-
+                buttonDelete.setTag(cursor.getString(idIndex));
+                buttonDelete.setId(cursor.getInt(idIndex));
+                dbOutputRow.addView(buttonDelete);
+                if(ShopItems.goodsInCart.contains(cursor.getString(idIndex)))
+                    buttonDelete.setText("Добавлено");
+                else
+                    buttonDelete.setText("В корзину");
                 dbOutput.addView(dbOutputRow);
             }
             while (cursor.moveToNext());
@@ -124,11 +126,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intentCart);
                 break;
             default:
-                Cursor cursorUpdater = database.query(DBHelper.TABLE_GOODS, null, null, null, null, null, null);
-                cursorUpdater.move(v.getId());
-                int priceIndex = cursorUpdater.getColumnIndex(DBHelper.KEY_PRICE);
-                String priceKek = cursorUpdater.getString(priceIndex);
-                ChangeSum(Integer.parseInt(priceKek));
+                String id = v.getTag().toString();
+                if(!ShopItems.goodsInCart.contains(id))
+                    ShopItems.goodsInCart.add(id);
+                else
+                    ShopItems.goodsInCart.remove(id);
+                UpdateTable();
                 break;
         }
     }
