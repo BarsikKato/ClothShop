@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int priceIndex = cursor.getColumnIndex(DBHelper.KEY_PRICE);
             TableLayout dbOutput = findViewById(R.id.dbOutput);
             dbOutput.removeAllViews();
+            ChangeSum(-sum);
             do{
                 TableRow dbOutputRow = new TableRow(this);
 
@@ -97,8 +98,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 buttonDelete.setTag(cursor.getString(idIndex));
                 buttonDelete.setId(cursor.getInt(idIndex));
                 dbOutputRow.addView(buttonDelete);
-                if(ShopItems.goodsInCart.contains(cursor.getString(idIndex)))
+                if(ShopItems.goodsInCart.contains(cursor.getString(idIndex))) {
                     buttonDelete.setText("Добавлено");
+                    int newSum = Integer.parseInt(outputPrice.getText().toString());
+                    ChangeSum(newSum);
+                }
                 else
                     buttonDelete.setText("В корзину");
                 dbOutput.addView(dbOutputRow);

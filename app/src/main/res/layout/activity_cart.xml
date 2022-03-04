@@ -96,7 +96,7 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/sumInCart"
                 android:layout_width="226dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

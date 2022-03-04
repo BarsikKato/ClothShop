@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class CartActivity extends AppCompatActivity implements View.OnClickListener{
@@ -29,9 +30,14 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
     SQLiteDatabase database;
     ContentValues contentValues;
 
+    int sum = 0;
+    TextView sumInCart;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+
+        sumInCart = findViewById(R.id.sumInCart);
 
         etName = findViewById(R.id.editTextTextPersonName);
         etAddress = findViewById(R.id.editTextTextPostalAddress);
@@ -61,6 +67,7 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
             dbOutput.removeAllViews();
             do{
                 String id = cursor.getString(idIndex);
+                ChangeSum(-sum);
                 if(ShopItems.goodsInCart.contains(id))
                 {
                     TableRow dbOutputRow = new TableRow(this);
@@ -85,6 +92,8 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
                     outputPrice.setLayoutParams(params);
                     outputPrice.setText(cursor.getString(priceIndex));
                     dbOutputRow.addView(outputPrice);
+                    int newSum = Integer.parseInt(outputPrice.getText().toString());
+                    ChangeSum(newSum);
 
                     Button buttonDelete = new Button(this);
                     buttonDelete.setOnClickListener(this);
@@ -106,6 +115,12 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
         cursor.close();
     }
 
+    public void ChangeSum(int sumToAdd)
+    {
+        sum = sum + sumToAdd;
+        sumInCart.setText("Сумма заказа: "  + sum);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onClick(View v) {
         switch (v.getId()) {
@@ -116,8 +131,44 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnOrder:
                 contentValues = new ContentValues();
                 String name = etName.getText().toString();
+                if(sum == 0)
+                {
+                    Toast toast = new Toast(getApplicationContext());
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setText("Заказ пустой!");
+                    toast.show();
+                    break;
+                }
+                if(name == null || name.trim().isEmpty())
+                {
+                    Toast toast = new Toast(getApplicationContext());
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setText("Введите имя!");
+                    toast.show();
+                    break;
+                }
                 String address = etAddress.getText().toString();
+                if(address == null || address.trim().isEmpty())
+                {
+                    Toast toast = new Toast(getApplicationContext());
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setText("Введите адрес!");
+                    toast.show();
+                    break;
+                }
                 String phone = etPhone.getText().toString();
+                if(phone == null || phone.trim().isEmpty())
+                {
+                    Toast toast = new Toast(getApplicationContext());
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setText("Введите номер телефона!");
+                    toast.show();
+                    break;
+                }
                 contentValues.put(DBHelper.KEY_USERNAME, name);
                 contentValues.put(DBHelper.KEY_USERADDRESS, address);
                 contentValues.put(DBHelper.KEY_USERPHONE, phone);
@@ -126,16 +177,21 @@ public class CartActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     contentValues = new ContentValues();
                     String order = Long.toString(addedID);
-                    String good = ShopItems.goodsInCart.get(i);
+                    String good = ShopItems.goodsInCart.get(i-1);
                     contentValues.put(DBHelper.KEY_OORDERID, order);
                     contentValues.put(DBHelper.KEY_GOODID, good);
                     database.insert(DBHelper.TABLE_ORDERGOODS, null, contentValues);
-                    ShopItems.goodsInCart.remove(good);
                 }
+                ShopItems.goodsInCart = new ArrayList<String>();
                 UpdateTable();
                 etName.setText("");
                 etAddress.setText("");
                 etPhone.setText("");
+                Toast toast = new Toast(getApplicationContext());
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setText("Заказ успешно оформлен!");
+                toast.show();
                 break;
             default:
                 String id = v.getTag().toString();
